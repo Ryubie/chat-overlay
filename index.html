@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cyberpunk Chat Overlay</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://socialstream.ninja/libs/colours.js" type="text/javascript"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&display=swap');
@@ -12,12 +12,9 @@
 :root {
     --cyber-pink: #ff0066;
     --cyber-cyan: #00ffff;
-    --cyber-blue: #0066ff;
-    --cyber-purple: #9933ff;
-    --cyber-green: #00ff66;
+    --cyber-green: #00ff88;
     --cyber-yellow: #ffff00;
-    --cyber-dark: #0a0a12;
-    --cyber-darker: #050508;
+    --cyber-dark: #0d0d14;
 }
 
 body, html {
@@ -25,15 +22,9 @@ body, html {
     padding: 0;
     width: 100%;
     height: 100%;
-    font-family: 'Share Tech Mono', 'Rajdhani', monospace;
+    font-family: 'Share Tech Mono', monospace;
     background-color: transparent;
     overflow: hidden;
-    box-sizing: border-box;
-}
-
-* {
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
 }
 
 #chat-container {
@@ -42,10 +33,10 @@ body, html {
     left: 50%;
     transform: translateX(-50%);
     width: 100%;
-    max-width: 500px;
+    max-width: 480px;
     height: 100vh;
     overflow: hidden;
-    padding: 0 20px;
+    padding: 0 25px;
     box-sizing: border-box;
 }
 
@@ -56,392 +47,324 @@ body, html {
 }
 
 /* ==================== */
-/* GLITCH ANIMATION     */
+/* GLITCH ON APPEAR     */
 /* ==================== */
-@keyframes glitch {
-    0% { transform: translate(0); }
-    20% { transform: translate(-2px, 2px); }
-    40% { transform: translate(-2px, -2px); }
-    60% { transform: translate(2px, 2px); }
-    80% { transform: translate(2px, -2px); }
-    100% { transform: translate(0); }
-}
-
 @keyframes glitchIn {
     0% { 
         opacity: 0;
-        transform: translateX(-20px) skewX(-5deg);
-        filter: hue-rotate(90deg);
-    }
-    10% { 
-        opacity: 1;
-        transform: translateX(10px) skewX(2deg);
+        transform: translateX(-30px);
+        clip-path: inset(0 100% 0 0);
     }
     20% { 
-        transform: translateX(-5px) skewX(-2deg);
-        filter: hue-rotate(0deg);
+        opacity: 1;
+        transform: translateX(8px) skewX(-2deg);
+        clip-path: inset(0 0 0 0);
+        filter: hue-rotate(90deg) brightness(2);
+    }
+    25% {
+        transform: translateX(-4px) skewX(1deg);
+        filter: hue-rotate(0deg) brightness(1);
     }
     30% { 
-        transform: translateX(3px) skewX(1deg);
+        transform: translateX(2px);
     }
     100% { 
         opacity: 1;
-        transform: translateX(0) skewX(0);
+        transform: translateX(0);
     }
 }
 
-@keyframes scanline {
-    0% { top: -100%; }
-    100% { top: 100%; }
-}
-
-@keyframes flicker {
-    0%, 100% { opacity: 1; }
-    92% { opacity: 1; }
-    93% { opacity: 0.8; }
-    94% { opacity: 1; }
-    95% { opacity: 0.9; }
-    96% { opacity: 1; }
-}
-
-@keyframes borderGlow {
-    0%, 100% { 
-        box-shadow: 0 0 5px var(--glow-color), inset 0 0 5px rgba(255,255,255,0.1);
+@keyframes glitchInSpecial {
+    0% { 
+        opacity: 0;
+        transform: scale(0.9) translateY(20px);
+        filter: brightness(3) hue-rotate(180deg);
     }
-    50% { 
-        box-shadow: 0 0 15px var(--glow-color), 0 0 30px var(--glow-color), inset 0 0 10px rgba(255,255,255,0.15);
+    15% {
+        opacity: 1;
+        transform: scale(1.02) translateY(-5px);
+        filter: brightness(2) hue-rotate(90deg);
     }
-}
-
-@keyframes pixelDance {
-    0%, 100% { opacity: 0.3; transform: scale(1); }
-    50% { opacity: 1; transform: scale(1.2); }
+    25% {
+        transform: scale(0.98) translateY(3px);
+        filter: brightness(1.5) hue-rotate(45deg);
+    }
+    35% {
+        transform: scale(1.01) translateY(-2px);
+        filter: brightness(1) hue-rotate(0deg);
+    }
+    100% { 
+        opacity: 1;
+        transform: scale(1) translateY(0);
+        filter: brightness(1) hue-rotate(0deg);
+    }
 }
 
 /* ==================== */
-/* MESSAGE STYLES       */
+/* MESSAGE CONTAINER    */
 /* ==================== */
 .message-outer {
     position: relative;
-    margin-bottom: 15px;
+    margin-bottom: 12px;
     opacity: 0;
-    animation: glitchIn 0.5s ease-out forwards;
 }
 
 .message-outer.visible {
-    opacity: 1;
+    animation: glitchIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
-/* Normal Chat Message */
+.message-outer.special-style.visible {
+    animation: glitchInSpecial 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* ==================== */
+/* NORMAL CHAT          */
+/* ==================== */
 .message {
-    --glow-color: var(--cyber-pink);
     position: relative;
-    background: linear-gradient(135deg, rgba(10, 10, 18, 0.95) 0%, rgba(5, 5, 8, 0.98) 100%);
-    border: 1px solid var(--cyber-pink);
+    background: rgba(13, 13, 20, 0.95);
     border-left: 3px solid var(--cyber-pink);
-    padding: 12px 15px;
+    padding: 10px 14px;
     color: #ffffff;
-    overflow: hidden;
-    box-sizing: border-box;
-    animation: borderGlow 2s ease-in-out infinite, flicker 4s infinite;
 }
 
-/* Scanline effect */
-.message::before {
-    content: '';
-    position: absolute;
-    top: -100%;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(
-        transparent 0%,
-        rgba(255, 255, 255, 0.03) 50%,
-        transparent 100%
-    );
-    animation: scanline 3s linear infinite;
-    pointer-events: none;
-}
-
-/* Corner decorations */
-.message::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 0;
-    height: 0;
-    border-style: solid;
-    border-width: 0 12px 12px 0;
-    border-color: transparent var(--cyber-pink) transparent transparent;
-}
-
-/* Platform Colors */
-.message[data-type="youtube"] {
-    --glow-color: #ff0000;
-    border-color: #ff0000;
-}
-
-.message[data-type="tiktok"] {
-    --glow-color: var(--cyber-cyan);
-    border-color: var(--cyber-cyan);
-}
-
-.message[data-type="twitch"] {
-    --glow-color: var(--cyber-purple);
-    border-color: var(--cyber-purple);
-}
-
-.message[data-type="kick"] {
-    --glow-color: var(--cyber-green);
-    border-color: var(--cyber-green);
-}
-
-.message[data-type="facebook"] {
-    --glow-color: var(--cyber-blue);
-    border-color: var(--cyber-blue);
-}
-
-/* Streamer - Green */
-.message.streamer {
-    --glow-color: var(--cyber-green);
-    border-color: var(--cyber-green);
-    background: linear-gradient(135deg, rgba(0, 40, 20, 0.95) 0%, rgba(0, 20, 10, 0.98) 100%);
-}
-
-/* Moderator */
-.message.moderator {
-    --glow-color: var(--cyber-purple);
-    border-color: var(--cyber-purple);
-    background: linear-gradient(135deg, rgba(30, 10, 40, 0.95) 0%, rgba(15, 5, 20, 0.98) 100%);
-}
+/* Platform border colors */
+.message[data-type="youtube"] { border-left-color: #ff0000; }
+.message[data-type="tiktok"] { border-left-color: var(--cyber-cyan); }
+.message[data-type="twitch"] { border-left-color: #9147ff; }
+.message[data-type="kick"] { border-left-color: var(--cyber-green); }
+.message[data-type="facebook"] { border-left-color: #0066ff; }
+.message.streamer { border-left-color: var(--cyber-green); }
+.message.moderator { border-left-color: #9147ff; }
 
 /* Username row */
 .username-row {
     display: flex;
     align-items: center;
     gap: 8px;
-    margin-bottom: 6px;
+    margin-bottom: 4px;
 }
 
 .username-prefix {
     color: var(--cyber-pink);
-    font-size: 1em;
+    font-size: 0.95em;
     font-weight: bold;
-    font-family: 'Share Tech Mono', monospace;
 }
+
+.message.streamer .username-prefix { color: var(--cyber-green); }
+.message.moderator .username-prefix { color: #9147ff; }
+.message[data-type="youtube"] .username-prefix { color: #ff0000; }
+.message[data-type="twitch"] .username-prefix { color: #9147ff; }
+.message[data-type="tiktok"] .username-prefix { color: var(--cyber-cyan); }
 
 .username {
     color: var(--cyber-cyan);
-    font-size: 0.95em;
+    font-size: 0.9em;
     font-weight: 700;
     font-family: 'Orbitron', sans-serif;
     text-transform: uppercase;
-    letter-spacing: 1px;
-    text-shadow: 0 0 10px var(--cyber-cyan);
+    letter-spacing: 0.5px;
 }
 
-.username-badge {
+.message.streamer .username { color: var(--cyber-green); }
+.message.moderator .username { color: #bf94ff; }
+
+.badge-box {
     background: var(--cyber-pink);
     color: #000;
-    font-size: 0.65em;
+    font-size: 0.6em;
     font-weight: 800;
     padding: 2px 6px;
     font-family: 'Orbitron', sans-serif;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
 }
 
+.badge-box.mod { background: #9147ff; color: #fff; }
+.badge-box.vip { background: var(--cyber-pink); }
+.badge-box.member { background: var(--cyber-cyan); color: #000; }
+.badge-box.owner { background: var(--cyber-green); color: #000; }
+
 /* Message text */
-.message-text-row {
+.message-row {
     display: flex;
     align-items: flex-start;
-    gap: 8px;
+    gap: 6px;
 }
 
 .message-prefix {
     color: var(--cyber-pink);
     font-size: 0.9em;
-    opacity: 0.7;
+    opacity: 0.6;
 }
 
+.message.streamer .message-prefix { color: var(--cyber-green); }
+.message.moderator .message-prefix { color: #9147ff; }
+
 .message-text {
-    color: #e0e0e0;
-    font-size: 0.95em;
-    line-height: 1.5;
+    color: #d0d0d0;
+    font-size: 0.92em;
+    line-height: 1.45;
     word-wrap: break-word;
     font-family: 'Rajdhani', sans-serif;
     font-weight: 500;
 }
 
 .message-text img {
-    max-width: 80px;
-    max-height: 28px;
-    vertical-align: middle;
+    max-width: 100%;
+    max-height: 80px;
+    display: block;
+    margin-top: 6px;
+    border: 1px solid var(--cyber-pink);
 }
 
 /* Source icon */
-.source-icon-wrap {
-    position: absolute;
-    top: 8px;
-    right: 20px;
-}
-
 .source-icon {
-    width: 18px;
-    height: 18px;
-    opacity: 0.8;
-    filter: drop-shadow(0 0 3px var(--glow-color));
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 16px;
+    height: 16px;
+    opacity: 0.7;
 }
 
-/* Badges */
+/* Chat badges */
 .badges-wrap {
     display: flex;
-    gap: 4px;
+    gap: 3px;
     margin-left: auto;
 }
 
-.badge {
-    height: 16px;
-    filter: drop-shadow(0 0 3px var(--cyber-cyan));
+.chat-badge {
+    height: 14px;
+    opacity: 0.9;
 }
 
 /* ==================== */
-/* SUBSCRIBER/DONATION  */
+/* SPECIAL: SUB/DONATE  */
 /* ==================== */
 .message-outer.special-style {
-    margin-bottom: 20px;
+    margin-bottom: 18px;
 }
 
-.special-box {
-    --glow-color: var(--cyber-pink);
+.special-container {
     position: relative;
-    background: linear-gradient(135deg, rgba(40, 0, 20, 0.95) 0%, rgba(20, 0, 10, 0.98) 100%);
-    border: 2px solid var(--cyber-pink);
-    padding: 0;
-    overflow: visible;
-    animation: borderGlow 1.5s ease-in-out infinite;
 }
 
 /* Pixel decorations */
-.pixel-decor {
+.pixel {
     position: absolute;
-    width: 6px;
-    height: 6px;
+    width: 5px;
+    height: 5px;
     background: var(--cyber-pink);
-    animation: pixelDance 1s ease-in-out infinite;
 }
 
-.pixel-decor:nth-child(1) { top: -8px; left: 20%; animation-delay: 0s; }
-.pixel-decor:nth-child(2) { top: -8px; right: 20%; animation-delay: 0.2s; }
-.pixel-decor:nth-child(3) { bottom: -8px; left: 30%; animation-delay: 0.4s; }
-.pixel-decor:nth-child(4) { bottom: -8px; right: 30%; animation-delay: 0.6s; }
-.pixel-decor:nth-child(5) { top: 50%; left: -8px; animation-delay: 0.3s; }
-.pixel-decor:nth-child(6) { top: 50%; right: -8px; animation-delay: 0.5s; }
+.pixel-1 { top: -7px; left: 15%; }
+.pixel-2 { top: -7px; left: 35%; }
+.pixel-3 { top: -7px; right: 35%; }
+.pixel-4 { top: -7px; right: 15%; }
+.pixel-5 { bottom: -7px; left: 20%; }
+.pixel-6 { bottom: -7px; right: 20%; }
+.pixel-7 { top: 30%; left: -7px; }
+.pixel-8 { top: 30%; right: -7px; }
+.pixel-9 { bottom: 30%; left: -7px; }
+.pixel-10 { bottom: 30%; right: -7px; }
+
+.special-box {
+    background: rgba(13, 13, 20, 0.98);
+    border: 2px solid var(--cyber-pink);
+    position: relative;
+}
 
 .special-header {
-    background: rgba(255, 0, 102, 0.2);
+    background: rgba(255, 0, 102, 0.15);
     border-bottom: 1px solid var(--cyber-pink);
-    padding: 6px 15px;
+    padding: 5px 12px;
     text-align: center;
 }
 
 .special-label {
     color: var(--cyber-pink);
-    font-size: 0.7em;
-    font-family: 'Orbitron', sans-serif;
+    font-size: 0.65em;
+    font-family: 'Share Tech Mono', monospace;
     font-weight: 600;
-    letter-spacing: 3px;
+    letter-spacing: 2px;
     text-transform: uppercase;
-    text-shadow: 0 0 10px var(--cyber-pink);
 }
 
-.special-content {
-    padding: 12px 15px;
+.special-body {
+    padding: 10px 15px;
     text-align: center;
 }
 
 .special-username {
     color: #ffffff;
-    font-size: 1.1em;
+    font-size: 1em;
     font-family: 'Orbitron', sans-serif;
     font-weight: 800;
     text-transform: uppercase;
-    letter-spacing: 2px;
-    display: inline;
+    letter-spacing: 1px;
 }
 
 .special-action {
     color: var(--cyber-cyan);
-    font-size: 0.9em;
+    font-size: 0.85em;
     font-family: 'Orbitron', sans-serif;
     font-weight: 600;
-    margin-left: 8px;
-    text-shadow: 0 0 10px var(--cyber-cyan);
+    margin-left: 10px;
 }
 
 .special-amount {
     color: var(--cyber-yellow);
-    font-size: 1em;
+    font-size: 0.95em;
     font-family: 'Orbitron', sans-serif;
     font-weight: 800;
     margin-left: 8px;
-    text-shadow: 0 0 15px var(--cyber-yellow);
 }
 
-/* Special message box */
-.special-message-box {
-    background: rgba(10, 10, 18, 0.9);
-    border: 1px solid rgba(255, 0, 102, 0.5);
+/* Message box below */
+.special-message {
+    background: rgba(13, 13, 20, 0.95);
+    border: 1px solid rgba(255, 0, 102, 0.4);
     border-top: none;
     padding: 10px 15px;
+    margin-top: -1px;
 }
 
 .special-message-text {
-    color: #c0c0c0;
-    font-size: 0.9em;
+    color: #b0b0b0;
+    font-size: 0.88em;
     font-family: 'Rajdhani', sans-serif;
     font-weight: 500;
     text-align: center;
     margin: 0;
+    line-height: 1.4;
 }
 
-/* Membership Style - Green */
+/* Membership - Green variant */
 .special-box.membership {
-    --glow-color: var(--cyber-green);
-    background: linear-gradient(135deg, rgba(0, 40, 20, 0.95) 0%, rgba(0, 20, 10, 0.98) 100%);
     border-color: var(--cyber-green);
 }
 
 .special-box.membership .special-header {
-    background: rgba(0, 255, 102, 0.15);
+    background: rgba(0, 255, 136, 0.1);
     border-color: var(--cyber-green);
 }
 
 .special-box.membership .special-label {
     color: var(--cyber-green);
-    text-shadow: 0 0 10px var(--cyber-green);
 }
 
-.special-box.membership .pixel-decor {
+.special-container.membership .pixel {
     background: var(--cyber-green);
 }
 
-.special-box.membership .special-message-box {
-    border-color: rgba(0, 255, 102, 0.5);
-}
-
-/* Donation Style - keep pink/red */
-.special-box.donation {
-    --glow-color: var(--cyber-pink);
+.special-container.membership .special-message {
+    border-color: rgba(0, 255, 136, 0.4);
 }
 
 #spacer {
     width: 100%;
-    padding: 0;
-    margin: 0;
-    border: none;
-    box-sizing: border-box;
     background: transparent;
 }
 </style>
@@ -449,7 +372,7 @@ body, html {
 <body>
 <div id="chat-container">
     <div id="message-list-wrapper">
-        <div id="spacer" style="height: 2200px; width: 100%;"></div>
+        <div id="spacer" style="height: 2200px;"></div>
     </div>
 </div>
 <script>
@@ -465,20 +388,7 @@ body, html {
     var MAX_MESSAGES = 20;
     
     // ============================================
-    const COLORS = {
-        streamer: '#00ff66',
-        moderator: '#9933ff',
-        youtube: '#ff0000',
-        tiktok: '#00ffff',
-        twitch: '#9933ff',
-        kick: '#00ff66',
-        facebook: '#0066ff',
-        twitter: '#00ffff',
-        default: '#ff0066'
-    };
-    
     var urlParams = new URLSearchParams(window.location.search);
-    
     if (urlParams.has("session")) SESSION_IDS.push(urlParams.get("session"));
     if (urlParams.has("streamer")) STREAMER_NAME = urlParams.get("streamer").toLowerCase();
     if (urlParams.has("limit")) MAX_MESSAGES = parseInt(urlParams.get("limit"));
@@ -513,225 +423,188 @@ body, html {
         });
     }
     
-    function getBadgeText(data) {
-        if (data.owner || data.isOwner) return 'OWNER';
-        if (data.mod || data.isMod || data.moderator) return 'MOD';
-        if (data.membership) return 'MEMBER';
-        if (data.chatbadges && data.chatbadges.length > 0) {
-            // Check for VIP or special badges
+    function getBadgeInfo(data) {
+        if (data.owner || data.isOwner) return { text: 'OWNER', class: 'owner' };
+        if (data.mod || data.isMod || data.moderator) return { text: 'MOD', class: 'mod' };
+        if (data.membership) return { text: 'MEMBER', class: 'member' };
+        if (data.chatbadges) {
             for (let badge of data.chatbadges) {
-                if (typeof badge === 'string') {
-                    if (badge.toLowerCase().includes('vip')) return 'VIP';
-                    if (badge.toLowerCase().includes('sub')) return 'SUB';
-                }
+                const str = typeof badge === 'string' ? badge : (badge.src || '');
+                if (str.toLowerCase().includes('vip')) return { text: 'VIP', class: 'vip' };
+                if (str.toLowerCase().includes('sub')) return { text: 'SUB', class: 'member' };
             }
         }
         return null;
     }
     
     function addMessageToOverlay(data) {
-        if (!data.chatname && !data.chatmessage && !data.hasDonation && !data.donation && !data.contentimg) {
-            return;
-        }
+        if (!data.chatname && !data.chatmessage && !data.hasDonation && !data.donation && !data.contentimg) return;
         
         const msgKey = data.mid || (data.chatname + data.chatmessage + (data.hasDonation || ''));
         if (processedMessages.has(msgKey)) return;
         processedMessages.add(msgKey);
         
         if (processedMessages.size > 200) {
-            const arr = Array.from(processedMessages);
-            arr.slice(0, 100).forEach(k => processedMessages.delete(k));
+            Array.from(processedMessages).slice(0, 100).forEach(k => processedMessages.delete(k));
         }
         
-        let isStreamer = false;
-        let isModerator = false;
-        let isMembership = false;
-        let isDonation = false;
+        let isStreamer = false, isModerator = false, isMembership = false, isDonation = false;
         
         if (STREAMER_NAME && data.chatname) {
-            const chatNameLower = data.chatname.toLowerCase();
-            if (chatNameLower === STREAMER_NAME || chatNameLower.includes(STREAMER_NAME) || STREAMER_NAME.includes(chatNameLower)) {
-                isStreamer = true;
-            }
+            const n = data.chatname.toLowerCase();
+            if (n === STREAMER_NAME || n.includes(STREAMER_NAME) || STREAMER_NAME.includes(n)) isStreamer = true;
         }
         if (data.owner || data.isOwner) isStreamer = true;
         if (data.membership) isMembership = true;
         if (data.hasDonation || data.donation) isDonation = true;
         if (data.mod || data.isMod || data.moderator) isModerator = true;
-        
         if (data.chatbadges) {
-            const hasMod = data.chatbadges.some(badge => {
-                if (typeof badge === 'string') return badge.toLowerCase().includes('moderator') || badge.toLowerCase().includes('/mod');
-                if (typeof badge === 'object' && badge.src) return badge.src.toLowerCase().includes('moderator') || badge.src.toLowerCase().includes('/mod');
-                return false;
-            });
-            if (hasMod) isModerator = true;
+            if (data.chatbadges.some(b => {
+                const s = typeof b === 'string' ? b : (b.src || '');
+                return s.toLowerCase().includes('moderator') || s.toLowerCase().includes('/mod');
+            })) isModerator = true;
         }
         
         const messageId = data.mid || 'msg-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
-        let messageOuter;
+        let messageOuter = document.createElement('div');
+        messageOuter.id = messageId;
         
         if ((isDonation || isMembership) && !isStreamer) {
-            // === SPECIAL STYLE (Donation/Membership) ===
-            messageOuter = document.createElement('div');
+            // === SPECIAL STYLE ===
             messageOuter.classList.add('message-outer', 'special-style');
-            messageOuter.id = messageId;
             
-            const isMemb = isMembership && !isDonation;
-            const boxClass = isMemb ? 'membership' : 'donation';
-            const labelText = isMemb ? 'NEW SUBSCRIBER' : 'DONATION';
-            const actionText = isMemb ? (data.membership || 'SUBSCRIBED') : '';
-            const amountText = isDonation ? (data.hasDonation || data.donation || '') : '';
-            const chatMessage = data.chatmessage || '';
+            const isMem = isMembership && !isDonation;
+            const typeClass = isMem ? 'membership' : 'donation';
+            const label = isMem ? 'NEW SUBSCRIBER' : 'NEW DONATION';
+            const action = isDonation ? '' : (data.membership || 'SUBSCRIBED');
+            const amount = isDonation ? (data.hasDonation || data.donation || '') : '';
+            const msg = data.chatmessage || '';
             
             let html = `
-                <div class="special-box ${boxClass}">
-                    <div class="pixel-decor"></div>
-                    <div class="pixel-decor"></div>
-                    <div class="pixel-decor"></div>
-                    <div class="pixel-decor"></div>
-                    <div class="pixel-decor"></div>
-                    <div class="pixel-decor"></div>
-                    <div class="special-header">
-                        <span class="special-label">[ ${labelText} ]</span>
+                <div class="special-container ${typeClass}">
+                    <div class="pixel pixel-1"></div>
+                    <div class="pixel pixel-2"></div>
+                    <div class="pixel pixel-3"></div>
+                    <div class="pixel pixel-4"></div>
+                    <div class="pixel pixel-5"></div>
+                    <div class="pixel pixel-6"></div>
+                    <div class="pixel pixel-7"></div>
+                    <div class="pixel pixel-8"></div>
+                    <div class="pixel pixel-9"></div>
+                    <div class="pixel pixel-10"></div>
+                    <div class="special-box ${typeClass}">
+                        <div class="special-header">
+                            <span class="special-label">[ ${label} ]</span>
+                        </div>
+                        <div class="special-body">
+                            <span class="special-username">${data.chatname || 'ANONYMOUS'}</span>
+                            ${action ? `<span class="special-action">${action}</span>` : ''}
+                            ${amount ? `<span class="special-amount">${amount}</span>` : ''}
+                        </div>
                     </div>
-                    <div class="special-content">
-                        <span class="special-username">${data.chatname || 'ANONYMOUS'}</span>
-                        ${actionText ? `<span class="special-action">${actionText}</span>` : ''}
-                        ${amountText ? `<span class="special-amount">${amountText}</span>` : ''}
-                    </div>
+                    ${msg ? `<div class="special-message"><p class="special-message-text">${msg}</p></div>` : ''}
                 </div>
             `;
-            
-            if (chatMessage) {
-                html += `
-                    <div class="special-message-box">
-                        <p class="special-message-text">${chatMessage}</p>
-                    </div>
-                `;
-            }
-            
             messageOuter.innerHTML = html;
             
         } else {
-            // === NORMAL CHAT STYLE ===
-            messageOuter = document.createElement('div');
+            // === NORMAL CHAT ===
             messageOuter.classList.add('message-outer');
-            messageOuter.id = messageId;
             
-            const messageDiv = document.createElement('div');
-            messageDiv.classList.add('message');
+            const msgDiv = document.createElement('div');
+            msgDiv.classList.add('message');
+            if (data.type) msgDiv.setAttribute('data-type', data.type.toLowerCase());
+            if (isStreamer) msgDiv.classList.add('streamer');
+            else if (isModerator) msgDiv.classList.add('moderator');
             
-            if (data.type) messageDiv.setAttribute('data-type', data.type.toLowerCase());
-            if (isStreamer) messageDiv.classList.add('streamer');
-            else if (isModerator) messageDiv.classList.add('moderator');
+            const badge = getBadgeInfo(data);
+            const badgeHtml = badge ? `<span class="badge-box ${badge.class}">${badge.text}</span>` : '';
             
-            const badgeText = getBadgeText(data);
-            const badgeHtml = badgeText ? `<span class="username-badge">${badgeText}</span>` : '';
-            
-            const sourceIconHtml = data.type ? 
-                `<div class="source-icon-wrap"><img src="https://socialstream.ninja/sources/images/${data.type}.png" alt="" class="source-icon"></div>` : '';
+            const srcIcon = data.type ? `<img src="https://socialstream.ninja/sources/images/${data.type}.png" class="source-icon" alt="">` : '';
             
             let badgesHtml = '';
             if (data.chatbadges) {
-                data.chatbadges.forEach(badge => {
-                    if (typeof badge === "object" && badge.src) {
-                        badgesHtml += `<img class='badge' src='${badge.src}' alt=''>`;
-                    } else if (typeof badge === 'string') {
-                        badgesHtml += `<img class='badge' src='${badge}' alt=''>`;
-                    }
+                data.chatbadges.forEach(b => {
+                    const src = typeof b === 'object' ? b.src : b;
+                    if (src) badgesHtml += `<img class="chat-badge" src="${src}" alt="">`;
                 });
             }
             
-            const contentImgHtml = data.contentimg ? 
-                `<div style="margin-top: 8px;"><img src="${data.contentimg}" style="max-width: 100%; border: 1px solid var(--cyber-pink); border-radius: 4px;" onerror="this.style.display='none';"></div>` : '';
+            const contentImg = data.contentimg ? `<img src="${data.contentimg}" onerror="this.style.display='none'">` : '';
 
-            messageDiv.innerHTML = `
-                ${sourceIconHtml}
+            msgDiv.innerHTML = `
+                ${srcIcon}
                 <div class="username-row">
                     <span class="username-prefix">+</span>
                     <span class="username">${data.chatname || 'ANON'}</span>
                     ${badgeHtml}
                     ${badgesHtml ? `<div class="badges-wrap">${badgesHtml}</div>` : ''}
                 </div>
-                <div class="message-text-row">
+                <div class="message-row">
                     <span class="message-prefix">›</span>
-                    <span class="message-text">${data.chatmessage || ''}${contentImgHtml}</span>
+                    <span class="message-text">${data.chatmessage || ''}${contentImg}</span>
                 </div>
             `;
             
-            messageOuter.appendChild(messageDiv);
+            messageOuter.appendChild(msgDiv);
         }
 
         if (reversed) {
-            const firstMessage = messageListWrapper.querySelector('.message-outer');
-            if (firstMessage) messageListWrapper.insertBefore(messageOuter, firstMessage);
+            const first = messageListWrapper.querySelector('.message-outer');
+            if (first) messageListWrapper.insertBefore(messageOuter, first);
             else messageListWrapper.appendChild(messageOuter);
         } else {
             messageListWrapper.appendChild(messageOuter);
         }
         
-        void messageOuter.offsetWidth;
-        messageOuter.classList.add('visible');
+        // Trigger animation
+        requestAnimationFrame(() => {
+            messageOuter.classList.add('visible');
+        });
         
-        const messages = Array.from(messageListWrapper.children).filter(
-            child => child.id !== 'spacer' && child.classList.contains('message-outer')
-        );
+        const messages = Array.from(messageListWrapper.children).filter(c => c.classList.contains('message-outer'));
         
         if (messages.length > MAX_MESSAGES) {
-            const oldestMessage = reversed ? messages[messages.length - 1] : messages[0];
-            if (oldestMessage) {
+            const oldest = reversed ? messages[messages.length - 1] : messages[0];
+            if (oldest) {
                 if (!reversed) {
-                    const style = getComputedStyle(oldestMessage);
-                    const space = oldestMessage.offsetHeight + (parseFloat(style.marginBottom) || 0);
-                    const currentHeight = parseFloat(topSpacer.style.height) || 0;
-                    let newHeight = currentHeight + space;
-                    if (newHeight > MAX_SPACER_HEIGHT_BEFORE_RESET) newHeight = 0;
-                    topSpacer.style.height = newHeight + 'px';
+                    const h = oldest.offsetHeight + (parseFloat(getComputedStyle(oldest).marginBottom) || 0);
+                    let newH = (parseFloat(topSpacer.style.height) || 0) + h;
+                    if (newH > MAX_SPACER_HEIGHT_BEFORE_RESET) newH = 0;
+                    topSpacer.style.height = newH + 'px';
                 }
-                messageListWrapper.removeChild(oldestMessage);
+                messageListWrapper.removeChild(oldest);
             }
         }
         
         adjustMessageWrapperScroll();
     }
 
-    // === SETUP MULTIPLE SESSIONS ===
-    SESSION_IDS.forEach(function(roomID) {
-        var iframe = document.createElement("iframe");
+    // === SETUP SESSIONS ===
+    SESSION_IDS.forEach(roomID => {
+        const iframe = document.createElement("iframe");
         iframe.src = featuredMode 
             ? `https://vdo.socialstream.ninja/?ln&password=${password}&salt=vdo.ninja&label=overlay&exclude=${roomID}&scene&novideo&noaudio&cleanoutput&room=${roomID}`
             : `https://vdo.socialstream.ninja/?ln&salt=vdo.ninja&password=${password}&push&label=dock&vd=0&ad=0&novideo&noaudio&autostart&cleanoutput&room=${roomID}`;
         iframe.style.cssText = "width:0;height:0;position:fixed;left:-100px;top:-100px;";
         document.body.appendChild(iframe);
         
-        var conCon = 1;
-        var serverURL = urlParams.has("localserver") ? "ws://127.0.0.1:3000" : "wss://io.socialstream.ninja";
+        let conCon = 1;
+        const serverURL = urlParams.has("localserver") ? "ws://127.0.0.1:3000" : "wss://io.socialstream.ninja";
         
         function setupSocket(){
-            var socketserver = new WebSocket(serverURL);
-            socketserver.onclose = () => setTimeout(() => { conCon++; setupSocket(); }, 100*conCon);
-            socketserver.onopen = () => { conCon = 1; socketserver.send(JSON.stringify({"join":roomID, "out":3, "in":4})); };
-            socketserver.addEventListener('message', (event) => {
-                if (event.data) {
-                    try { addMessageToOverlay(JSON.parse(event.data)); } 
-                    catch (e) { console.error(e); }
-                }
-            });
+            const ws = new WebSocket(serverURL);
+            ws.onclose = () => setTimeout(() => { conCon++; setupSocket(); }, 100*conCon);
+            ws.onopen = () => { conCon = 1; ws.send(JSON.stringify({"join":roomID, "out":3, "in":4})); };
+            ws.onmessage = e => { try { addMessageToOverlay(JSON.parse(e.data)); } catch(err){} };
         }
         
-        if (urlParams.has("server") || urlParams.has("server2")) {
-            serverURL = urlParams.get("server") || urlParams.get("server2") || serverURL;
-            setupSocket();
-        }
-        
-        console.log("Session connected:", roomID);
+        if (urlParams.has("server") || urlParams.has("server2")) setupSocket();
+        console.log("Connected:", roomID);
     });
     
-    window.addEventListener("message", (e) => {
-        if (e.data.dataReceived && e.data.dataReceived.overlayNinja) {
-            addMessageToOverlay(e.data.dataReceived.overlayNinja);
-        }
+    window.addEventListener("message", e => {
+        if (e.data.dataReceived?.overlayNinja) addMessageToOverlay(e.data.dataReceived.overlayNinja);
     });
 </script>
 </body>
