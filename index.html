@@ -29,22 +29,21 @@ body, html {
 
 #chat-container {
     position: absolute;
-    bottom: 30px;
+    bottom: 20px;
     left: 0;
     right: 0;
     width: 100%;
-    padding: 0 20px;
+    padding: 0 15px;
     box-sizing: border-box;
 }
 
 #message-list-wrapper {
     display: flex;
     flex-direction: row;
-    align-items: flex-end;
-    justify-content: flex-end;
-    gap: 15px;
-    flex-wrap: nowrap;
-    overflow: hidden;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 12px;
+    width: 100%;
 }
 
 /* Glitch animation on appear */
@@ -85,9 +84,9 @@ body, html {
 /* MESSAGE ITEM         */
 /* ==================== */
 .message-outer {
-    flex-shrink: 0;
-    max-width: 450px;
-    min-width: 200px;
+    flex: 1 1 0;
+    min-width: 0;
+    max-width: 100%;
     opacity: 0;
     animation: glitchIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
@@ -107,6 +106,9 @@ body, html {
     border: 2px solid var(--border-color);
     border-left: 4px solid var(--border-color);
     position: relative;
+    height: 85px; /* FIXED HEIGHT - semua box sama */
+    box-sizing: border-box;
+    overflow: hidden;
 }
 
 /* Platform colors */
@@ -125,8 +127,8 @@ body, html {
     position: absolute;
     top: -2px;
     right: -2px;
-    width: 10px;
-    height: 10px;
+    width: 8px;
+    height: 8px;
     border-top: 2px solid var(--border-color);
     border-right: 2px solid var(--border-color);
 }
@@ -136,8 +138,8 @@ body, html {
     position: absolute;
     bottom: -2px;
     left: -4px;
-    width: 10px;
-    height: 10px;
+    width: 8px;
+    height: 8px;
     border-bottom: 2px solid var(--border-color);
     border-left: 2px solid var(--border-color);
 }
@@ -147,9 +149,11 @@ body, html {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 6px 12px;
+    padding: 5px 10px;
     border-bottom: 1px solid rgba(255,255,255,0.1);
     background: rgba(255,255,255,0.03);
+    flex-shrink: 0;
+    overflow: hidden;
 }
 
 .badge-box {
@@ -161,6 +165,7 @@ body, html {
     font-family: 'Orbitron', sans-serif;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    flex-shrink: 0;
 }
 
 .badge-box.mod { background: #9147ff; color: #fff; }
@@ -171,11 +176,16 @@ body, html {
 
 .username {
     color: var(--cyber-cyan);
-    font-size: 0.85em;
+    font-size: 0.8em;
     font-weight: 700;
     font-family: 'Orbitron', sans-serif;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+    min-width: 0;
 }
 
 .message.streamer .username { color: var(--cyber-green); }
@@ -183,39 +193,55 @@ body, html {
 
 .action-text {
     color: var(--cyber-yellow);
-    font-size: 0.8em;
+    font-size: 0.75em;
     font-family: 'Orbitron', sans-serif;
     font-weight: 700;
-    margin-left: auto;
+    flex-shrink: 0;
+    white-space: nowrap;
 }
 
 .source-icon {
-    width: 16px;
-    height: 16px;
+    width: 14px;
+    height: 14px;
     opacity: 0.7;
-    margin-left: 8px;
+    flex-shrink: 0;
 }
 
-/* Message body */
+/* Message body - FIXED HEIGHT, overflow hidden */
 .message-body {
-    padding: 8px 12px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
+    padding: 8px 10px;
+    flex: 1;
+    overflow: hidden;
+    min-height: 0;
 }
 
 .message-text {
     color: #c0c0c0;
-    font-size: 0.88em;
+    font-size: 0.85em;
     font-family: 'Rajdhani', sans-serif;
     font-weight: 500;
     line-height: 1.4;
+    /* Text truncation - kepotong kalau panjang */
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Max 2 baris */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
     word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
+/* FIXED SIZE FOR ALL IMAGES/EMOTES/GIF */
 .message-text img {
-    height: 22px;
+    width: 24px !important;
+    height: 24px !important;
+    max-width: 24px !important;
+    max-height: 24px !important;
+    min-width: 24px !important;
+    min-height: 24px !important;
+    object-fit: contain;
     vertical-align: middle;
+    display: inline-block;
 }
 
 /* ==================== */
@@ -236,9 +262,11 @@ body, html {
 
 .special-amount {
     color: var(--cyber-yellow);
-    font-size: 0.9em;
+    font-size: 0.8em;
     font-family: 'Orbitron', sans-serif;
     font-weight: 800;
+    flex-shrink: 0;
+    white-space: nowrap;
 }
 
 /* Pixel decorations for special */
@@ -278,7 +306,7 @@ body, html {
     ];
     
     var STREAMER_NAME = "ryubie";
-    var MAX_MESSAGES = 4; // Max chat yang tampil horizontal
+    var MAX_MESSAGES = 4; // Jumlah slot horizontal
     
     // ============================================
     var urlParams = new URLSearchParams(window.location.search);
@@ -385,18 +413,16 @@ body, html {
                     ${actionHtml}
                     ${srcIcon}
                 </div>
-                ${msgText ? `
                 <div class="message-body">
-                    <span class="message-text">${msgText}</span>
+                    <span class="message-text">${msgText || '&nbsp;'}</span>
                 </div>
-                ` : ''}
             </div>
         `;
 
         // Add to wrapper
         messageListWrapper.appendChild(messageOuter);
         
-        // Remove old messages with animation
+        // Remove OLDEST message when exceeds MAX
         const messages = messageListWrapper.querySelectorAll('.message-outer');
         if (messages.length > MAX_MESSAGES) {
             const oldest = messages[0];
