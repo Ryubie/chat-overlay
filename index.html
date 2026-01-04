@@ -13,8 +13,8 @@
     --cyber-pink: #ff0066;
     --cyber-cyan: #00ffff;
     --cyber-green: #00ff88;
-    --cyber-yellow: #ffff00;
-    --cyber-dark: #0d0d14;
+    --cyber-yellow: #ffcc00;
+    --cyber-dark: #0a0a10;
 }
 
 body, html {
@@ -31,50 +31,53 @@ body, html {
     position: absolute;
     bottom: 30px;
     left: 0;
+    right: 0;
     width: 100%;
-    height: auto;
-    overflow: hidden;
-    padding: 10px 0;
+    padding: 0 20px;
+    box-sizing: border-box;
 }
 
 #message-list-wrapper {
     display: flex;
     flex-direction: row;
-    align-items: center;
-    gap: 20px;
-    padding-left: 100%;
-    animation: scrollLeft 30s linear infinite;
-    width: max-content;
+    align-items: flex-end;
+    justify-content: flex-end;
+    gap: 15px;
+    flex-wrap: nowrap;
+    overflow: hidden;
 }
 
-#message-list-wrapper:hover {
-    animation-play-state: paused;
-}
-
-@keyframes scrollLeft {
-    0% {
-        transform: translateX(0);
-    }
-    100% {
-        transform: translateX(-100%);
-    }
-}
-
-/* Glitch on appear */
+/* Glitch animation on appear */
 @keyframes glitchIn {
     0% { 
         opacity: 0;
-        transform: translateY(20px);
-        filter: hue-rotate(90deg) brightness(2);
+        transform: translateX(50px) scaleX(0.8);
+        filter: hue-rotate(180deg) brightness(2);
     }
-    30% { 
+    20% { 
         opacity: 1;
-        transform: translateY(-5px);
+        transform: translateX(-10px) scaleX(1.02);
+        filter: hue-rotate(90deg) brightness(1.5);
+    }
+    40% {
+        transform: translateX(5px) scaleX(0.98);
         filter: hue-rotate(0deg) brightness(1);
     }
     100% { 
         opacity: 1;
-        transform: translateY(0);
+        transform: translateX(0) scaleX(1);
+    }
+}
+
+@keyframes glitchOut {
+    0% { 
+        opacity: 1;
+        transform: translateX(0);
+    }
+    100% { 
+        opacity: 0;
+        transform: translateX(-50px);
+        filter: brightness(0.5);
     }
 }
 
@@ -83,39 +86,88 @@ body, html {
 /* ==================== */
 .message-outer {
     flex-shrink: 0;
+    max-width: 450px;
+    min-width: 200px;
     opacity: 0;
-    animation: glitchIn 0.4s ease-out forwards;
+    animation: glitchIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
+.message-outer.removing {
+    animation: glitchOut 0.3s ease-out forwards;
+}
+
+/* ==================== */
+/* NORMAL CHAT          */
+/* ==================== */
 .message {
+    --border-color: var(--cyber-pink);
     display: flex;
-    align-items: center;
-    gap: 10px;
-    background: rgba(13, 13, 20, 0.95);
-    border-left: 3px solid var(--cyber-pink);
-    padding: 8px 15px;
-    white-space: nowrap;
+    flex-direction: column;
+    background: var(--cyber-dark);
+    border: 2px solid var(--border-color);
+    border-left: 4px solid var(--border-color);
+    position: relative;
 }
 
 /* Platform colors */
-.message[data-type="youtube"] { border-left-color: #ff0000; }
-.message[data-type="tiktok"] { border-left-color: var(--cyber-cyan); }
-.message[data-type="twitch"] { border-left-color: #9147ff; }
-.message[data-type="kick"] { border-left-color: var(--cyber-green); }
-.message.streamer { border-left-color: var(--cyber-green); }
-.message.moderator { border-left-color: #9147ff; }
+.message[data-type="youtube"] { --border-color: #ff0000; }
+.message[data-type="tiktok"] { --border-color: var(--cyber-cyan); }
+.message[data-type="twitch"] { --border-color: #9147ff; }
+.message[data-type="kick"] { --border-color: var(--cyber-green); }
+.message.streamer { --border-color: var(--cyber-green); }
+.message.moderator { --border-color: #9147ff; }
+.message.member { --border-color: var(--cyber-cyan); }
+.message.donation { --border-color: var(--cyber-pink); }
 
-.username-prefix {
-    color: var(--cyber-pink);
-    font-size: 0.9em;
-    font-weight: bold;
+/* Corner accent */
+.message::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    width: 10px;
+    height: 10px;
+    border-top: 2px solid var(--border-color);
+    border-right: 2px solid var(--border-color);
 }
 
-.message.streamer .username-prefix { color: var(--cyber-green); }
-.message.moderator .username-prefix { color: #9147ff; }
-.message[data-type="youtube"] .username-prefix { color: #ff0000; }
-.message[data-type="twitch"] .username-prefix { color: #9147ff; }
-.message[data-type="tiktok"] .username-prefix { color: var(--cyber-cyan); }
+.message::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: -4px;
+    width: 10px;
+    height: 10px;
+    border-bottom: 2px solid var(--border-color);
+    border-left: 2px solid var(--border-color);
+}
+
+/* Header row - username on top */
+.message-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.03);
+}
+
+.badge-box {
+    background: var(--cyber-pink);
+    color: #000;
+    font-size: 0.6em;
+    font-weight: 800;
+    padding: 2px 6px;
+    font-family: 'Orbitron', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.badge-box.mod { background: #9147ff; color: #fff; }
+.badge-box.member { background: var(--cyber-cyan); color: #000; }
+.badge-box.owner { background: var(--cyber-green); color: #000; }
+.badge-box.sub { background: var(--cyber-green); color: #000; }
+.badge-box.gift { background: var(--cyber-pink); color: #fff; }
 
 .username {
     color: var(--cyber-cyan);
@@ -129,112 +181,57 @@ body, html {
 .message.streamer .username { color: var(--cyber-green); }
 .message.moderator .username { color: #bf94ff; }
 
-.badge-box {
-    background: var(--cyber-pink);
-    color: #000;
-    font-size: 0.55em;
-    font-weight: 800;
-    padding: 2px 5px;
+.action-text {
+    color: var(--cyber-yellow);
+    font-size: 0.8em;
     font-family: 'Orbitron', sans-serif;
-    text-transform: uppercase;
-}
-
-.badge-box.mod { background: #9147ff; color: #fff; }
-.badge-box.member { background: var(--cyber-cyan); color: #000; }
-.badge-box.owner { background: var(--cyber-green); color: #000; }
-
-.message-divider {
-    color: var(--cyber-pink);
-    opacity: 0.5;
-    font-size: 0.9em;
-}
-
-.message.streamer .message-divider { color: var(--cyber-green); }
-.message.moderator .message-divider { color: #9147ff; }
-
-.message-text {
-    color: #d0d0d0;
-    font-size: 0.9em;
-    font-family: 'Rajdhani', sans-serif;
-    font-weight: 500;
-    max-width: 400px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.message-text img {
-    height: 24px;
-    vertical-align: middle;
+    font-weight: 700;
+    margin-left: auto;
 }
 
 .source-icon {
     width: 16px;
     height: 16px;
     opacity: 0.7;
-    margin-left: 5px;
+    margin-left: 8px;
+}
+
+/* Message body */
+.message-body {
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.message-text {
+    color: #c0c0c0;
+    font-size: 0.88em;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 500;
+    line-height: 1.4;
+    word-wrap: break-word;
+}
+
+.message-text img {
+    height: 22px;
+    vertical-align: middle;
 }
 
 /* ==================== */
 /* SPECIAL: SUB/DONATE  */
 /* ==================== */
-.special-box {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: rgba(13, 13, 20, 0.98);
-    border: 2px solid var(--cyber-pink);
-    padding: 8px 15px;
-    position: relative;
+.message.special {
+    border-width: 2px;
+    border-left-width: 4px;
 }
 
-.special-box.membership {
-    border-color: var(--cyber-green);
+.message.special.membership {
+    --border-color: var(--cyber-green);
 }
 
-.pixel {
-    position: absolute;
-    width: 4px;
-    height: 4px;
-    background: var(--cyber-pink);
-}
-
-.pixel-1 { top: -5px; left: 20%; }
-.pixel-2 { top: -5px; right: 20%; }
-.pixel-3 { bottom: -5px; left: 30%; }
-.pixel-4 { bottom: -5px; right: 30%; }
-
-.special-box.membership .pixel {
-    background: var(--cyber-green);
-}
-
-.special-label {
-    color: var(--cyber-pink);
-    font-size: 0.6em;
-    font-family: 'Share Tech Mono', monospace;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    padding: 2px 6px;
-    border: 1px solid var(--cyber-pink);
-}
-
-.special-box.membership .special-label {
-    color: var(--cyber-green);
-    border-color: var(--cyber-green);
-}
-
-.special-username {
-    color: #ffffff;
-    font-size: 0.9em;
-    font-family: 'Orbitron', sans-serif;
-    font-weight: 800;
-    text-transform: uppercase;
-}
-
-.special-action {
-    color: var(--cyber-cyan);
-    font-size: 0.8em;
-    font-family: 'Orbitron', sans-serif;
-    font-weight: 600;
+.message.special.donation {
+    --border-color: var(--cyber-pink);
 }
 
 .special-amount {
@@ -244,21 +241,27 @@ body, html {
     font-weight: 800;
 }
 
-.special-message-text {
-    color: #a0a0a0;
-    font-size: 0.85em;
-    font-family: 'Rajdhani', sans-serif;
-    max-width: 300px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    border-left: 1px solid var(--cyber-pink);
-    padding-left: 10px;
-    margin-left: 5px;
+/* Pixel decorations for special */
+.pixel-wrap {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
 }
 
-.special-box.membership .special-message-text {
-    border-color: var(--cyber-green);
+.pixel {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: var(--border-color);
 }
+
+.pixel-1 { top: -6px; left: 20%; }
+.pixel-2 { top: -6px; right: 20%; }
+.pixel-3 { bottom: -6px; left: 30%; }
+.pixel-4 { bottom: -6px; right: 30%; }
 </style>
 </head>
 <body>
@@ -275,45 +278,30 @@ body, html {
     ];
     
     var STREAMER_NAME = "ryubie";
-    var MAX_MESSAGES = 15;
-    
-    // Scroll speed (seconds) - lebih kecil = lebih cepat
-    var SCROLL_SPEED = 25;
+    var MAX_MESSAGES = 4; // Max chat yang tampil horizontal
     
     // ============================================
     var urlParams = new URLSearchParams(window.location.search);
     if (urlParams.has("session")) SESSION_IDS.push(urlParams.get("session"));
     if (urlParams.has("streamer")) STREAMER_NAME = urlParams.get("streamer").toLowerCase();
     if (urlParams.has("limit")) MAX_MESSAGES = parseInt(urlParams.get("limit"));
-    if (urlParams.has("speed")) SCROLL_SPEED = parseInt(urlParams.get("speed"));
     
     var password = "false";
     var featuredMode = false;
 
     const messageListWrapper = document.getElementById('message-list-wrapper');
     const processedMessages = new Set();
-    
-    // Set scroll speed
-    messageListWrapper.style.animationDuration = SCROLL_SPEED + 's';
 
-    function recalculateScroll() {
-        const wrapper = messageListWrapper;
-        const contentWidth = wrapper.scrollWidth;
-        
-        // Adjust animation duration based on content width
-        const baseSpeed = SCROLL_SPEED;
-        const adjustedSpeed = Math.max(baseSpeed, contentWidth / 50);
-        wrapper.style.animationDuration = adjustedSpeed + 's';
-    }
-    
     function getBadgeInfo(data) {
         if (data.owner || data.isOwner) return { text: 'OWNER', class: 'owner' };
         if (data.mod || data.isMod || data.moderator) return { text: 'MOD', class: 'mod' };
-        if (data.membership) return { text: 'MEMBER', class: 'member' };
+        if (data.hasDonation || data.donation) return { text: 'GIFT', class: 'gift' };
+        if (data.membership) return { text: 'SUB', class: 'sub' };
         if (data.chatbadges) {
             for (let badge of data.chatbadges) {
                 const str = typeof badge === 'string' ? badge : (badge.src || '');
                 if (str.toLowerCase().includes('vip')) return { text: 'VIP', class: 'vip' };
+                if (str.toLowerCase().includes('sub')) return { text: 'SUB', class: 'sub' };
             }
         }
         return null;
@@ -352,66 +340,71 @@ body, html {
         messageOuter.classList.add('message-outer');
         messageOuter.id = messageId;
         
-        if ((isDonation || isMembership) && !isStreamer) {
-            // === SPECIAL STYLE ===
-            const isMem = isMembership && !isDonation;
-            const typeClass = isMem ? 'membership' : 'donation';
-            const label = isMem ? 'SUB' : 'GIFT';
-            const action = isDonation ? '' : (data.membership || '');
-            const amount = isDonation ? (data.hasDonation || data.donation || '') : '';
-            const msg = data.chatmessage || '';
-            
-            messageOuter.innerHTML = `
-                <div class="special-box ${typeClass}">
-                    <div class="pixel pixel-1"></div>
-                    <div class="pixel pixel-2"></div>
-                    <div class="pixel pixel-3"></div>
-                    <div class="pixel pixel-4"></div>
-                    <span class="special-label">${label}</span>
-                    <span class="special-username">${data.chatname || 'ANON'}</span>
-                    ${action ? `<span class="special-action">${action}</span>` : ''}
-                    ${amount ? `<span class="special-amount">${amount}</span>` : ''}
-                    ${msg ? `<span class="special-message-text">${msg}</span>` : ''}
-                </div>
-            `;
-            
-        } else {
-            // === NORMAL CHAT ===
-            const msgDiv = document.createElement('div');
-            msgDiv.classList.add('message');
-            if (data.type) msgDiv.setAttribute('data-type', data.type.toLowerCase());
-            if (isStreamer) msgDiv.classList.add('streamer');
-            else if (isModerator) msgDiv.classList.add('moderator');
-            
-            const badge = getBadgeInfo(data);
-            const badgeHtml = badge ? `<span class="badge-box ${badge.class}">${badge.text}</span>` : '';
-            
-            const srcIcon = data.type ? `<img src="https://socialstream.ninja/sources/images/${data.type}.png" class="source-icon" alt="">` : '';
-            
-            // Clean message (remove images for horizontal)
-            let cleanMsg = data.chatmessage || '';
-            
-            msgDiv.innerHTML = `
-                <span class="username-prefix">+</span>
-                <span class="username">${data.chatname || 'ANON'}</span>
-                ${badgeHtml}
-                <span class="message-divider">›</span>
-                <span class="message-text">${cleanMsg}</span>
-                ${srcIcon}
-            `;
-            
-            messageOuter.appendChild(msgDiv);
+        // Determine classes
+        let msgClasses = ['message'];
+        if (data.type) msgClasses.push(data.type.toLowerCase());
+        if (isStreamer) msgClasses.push('streamer');
+        else if (isModerator) msgClasses.push('moderator');
+        if (isMembership) msgClasses.push('member', 'special', 'membership');
+        if (isDonation) msgClasses.push('donation', 'special');
+        
+        // Get badge
+        const badge = getBadgeInfo(data);
+        const badgeHtml = badge ? `<span class="badge-box ${badge.class}">${badge.text}</span>` : '';
+        
+        // Action text (for donation amount or membership)
+        let actionHtml = '';
+        if (isDonation && (data.hasDonation || data.donation)) {
+            actionHtml = `<span class="special-amount">${data.hasDonation || data.donation}</span>`;
+        } else if (isMembership && data.membership) {
+            actionHtml = `<span class="action-text">${data.membership}</span>`;
         }
+        
+        // Source icon
+        const srcIcon = data.type ? `<img src="https://socialstream.ninja/sources/images/${data.type}.png" class="source-icon" alt="">` : '';
+        
+        // Message text
+        const msgText = data.chatmessage || '';
+        
+        // Pixel decorations for special messages
+        const pixelHtml = (isDonation || isMembership) ? `
+            <div class="pixel-wrap">
+                <div class="pixel pixel-1"></div>
+                <div class="pixel pixel-2"></div>
+                <div class="pixel pixel-3"></div>
+                <div class="pixel pixel-4"></div>
+            </div>
+        ` : '';
+        
+        messageOuter.innerHTML = `
+            <div class="${msgClasses.join(' ')}" ${data.type ? `data-type="${data.type.toLowerCase()}"` : ''}>
+                ${pixelHtml}
+                <div class="message-header">
+                    ${badgeHtml}
+                    <span class="username">${data.chatname || 'ANON'}</span>
+                    ${actionHtml}
+                    ${srcIcon}
+                </div>
+                ${msgText ? `
+                <div class="message-body">
+                    <span class="message-text">${msgText}</span>
+                </div>
+                ` : ''}
+            </div>
+        `;
 
+        // Add to wrapper
         messageListWrapper.appendChild(messageOuter);
         
-        // Remove old messages
+        // Remove old messages with animation
         const messages = messageListWrapper.querySelectorAll('.message-outer');
         if (messages.length > MAX_MESSAGES) {
-            messages[0].remove();
+            const oldest = messages[0];
+            oldest.classList.add('removing');
+            setTimeout(() => {
+                if (oldest.parentNode) oldest.remove();
+            }, 300);
         }
-        
-        recalculateScroll();
     }
 
     // === SETUP SESSIONS ===
