@@ -40,10 +40,12 @@ body, html {
 #message-list-wrapper {
     display: flex;
     flex-direction: row;
-    align-items: stretch;
+    align-items: flex-end;
     justify-content: flex-start;
     gap: 12px;
     width: 100%;
+    flex-wrap: nowrap;
+    overflow: hidden;
 }
 
 /* Glitch animation on appear */
@@ -84,9 +86,9 @@ body, html {
 /* MESSAGE ITEM         */
 /* ==================== */
 .message-outer {
-    flex: 1 1 0;
-    min-width: 0;
-    max-width: 100%;
+    flex-shrink: 0;
+    min-width: 150px;
+    max-width: 400px; /* Max width - kalau lebih, text wrap ke bawah */
     opacity: 0;
     animation: glitchIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
@@ -106,7 +108,7 @@ body, html {
     border: 2px solid var(--border-color);
     border-left: 4px solid var(--border-color);
     position: relative;
-    height: 85px; /* FIXED HEIGHT - semua box sama */
+    height: 85px; /* FIXED HEIGHT */
     box-sizing: border-box;
     overflow: hidden;
 }
@@ -184,7 +186,6 @@ body, html {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    flex: 1;
     min-width: 0;
 }
 
@@ -198,6 +199,7 @@ body, html {
     font-weight: 700;
     flex-shrink: 0;
     white-space: nowrap;
+    margin-left: auto;
 }
 
 .source-icon {
@@ -207,7 +209,7 @@ body, html {
     flex-shrink: 0;
 }
 
-/* Message body - FIXED HEIGHT, overflow hidden */
+/* Message body */
 .message-body {
     padding: 8px 10px;
     flex: 1;
@@ -221,9 +223,9 @@ body, html {
     font-family: 'Rajdhani', sans-serif;
     font-weight: 500;
     line-height: 1.4;
-    /* Text truncation - kepotong kalau panjang */
+    /* Text wrap dan kepotong kalau melebihi */
     display: -webkit-box;
-    -webkit-line-clamp: 2; /* Max 2 baris */
+    -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -267,6 +269,7 @@ body, html {
     font-weight: 800;
     flex-shrink: 0;
     white-space: nowrap;
+    margin-left: auto;
 }
 
 /* Pixel decorations for special */
@@ -306,7 +309,7 @@ body, html {
     ];
     
     var STREAMER_NAME = "ryubie";
-    var MAX_MESSAGES = 4; // Jumlah slot horizontal
+    var MAX_MESSAGES = 6; // Max chat yang tampil
     
     // ============================================
     var urlParams = new URLSearchParams(window.location.search);
@@ -380,7 +383,7 @@ body, html {
         const badge = getBadgeInfo(data);
         const badgeHtml = badge ? `<span class="badge-box ${badge.class}">${badge.text}</span>` : '';
         
-        // Action text (for donation amount or membership)
+        // Action text
         let actionHtml = '';
         if (isDonation && (data.hasDonation || data.donation)) {
             actionHtml = `<span class="special-amount">${data.hasDonation || data.donation}</span>`;
@@ -394,7 +397,7 @@ body, html {
         // Message text
         const msgText = data.chatmessage || '';
         
-        // Pixel decorations for special messages
+        // Pixel decorations
         const pixelHtml = (isDonation || isMembership) ? `
             <div class="pixel-wrap">
                 <div class="pixel pixel-1"></div>
@@ -422,7 +425,7 @@ body, html {
         // Add to wrapper
         messageListWrapper.appendChild(messageOuter);
         
-        // Remove OLDEST message when exceeds MAX
+        // Remove oldest when exceeds MAX
         const messages = messageListWrapper.querySelectorAll('.message-outer');
         if (messages.length > MAX_MESSAGES) {
             const oldest = messages[0];
